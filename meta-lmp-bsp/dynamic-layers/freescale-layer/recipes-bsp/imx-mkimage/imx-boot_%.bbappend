@@ -1,24 +1,24 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
-DEPENDS_remove = "optee-os"
+DEPENDS:remove = "optee-os"
 DEPENDS += "${@bb.utils.contains('MACHINE_FEATURES', 'optee', 'virtual/optee-os', '', d)}"
 
 
 # TODO: Need to figure out why this is breaking mfgtool builds on mx8mp
 # For now only apply the patch to mx8mm and mx8mq
-SRC_URL_append_mx8mm = " \
+SRC_URL:append:mx8mm = " \
      file://0001-iMX8M-support-SPL-ddr-sign.patch \
 "
-SRC_URL_append_mx8mq = " \
+SRC_URL:append:mx8mq = " \
      file://0001-iMX8M-support-SPL-ddr-sign.patch \
 "
-SRC_URI_append_mx8m = " \
+SRC_URI:append:mx8m = " \
      file://0002-iMX8M-add-SPL-only-build.patch \
      file://0003-iMX8M-add-support-for-packing-HDMI-fw-in-SPL-only-bo.patch \
      file://0004-iMX8M-also-create-nohdmi-boot-image.patch \
 "
 
-SRC_URI_append_mx8qm = " \
+SRC_URI:append:mx8qm = " \
      file://0001-iMX8QM-add-SPL-only-build.patch \
 "
 
@@ -29,7 +29,7 @@ do_compile[depends] = " \
     ${@bb.utils.contains('MACHINE_FEATURES', 'optee', 'virtual/optee-os:do_deploy', '', d)} \
 "
 
-do_compile_prepend_mx8() {
+do_compile:prepend:mx8() {
     for target in ${IMXBOOT_TARGETS}; do
         if [ "${target}" = "flash_evk_spl" ]; then
             # copy u-boot-spl-nodtb instead of u-boot-spl.bin as we need to have
@@ -45,7 +45,7 @@ do_compile_prepend_mx8() {
     done
 }
 
-do_compile_append() {
+do_compile:append() {
     for target in ${IMXBOOT_TARGETS}; do
         if [ "${target}" = "flash_evk_spl" ]; then
             if [ -e "${BOOT_STAGING}/flash.bin-nohdmi" ]; then
@@ -55,7 +55,7 @@ do_compile_append() {
     done
 }
 
-do_install_append() {
+do_install:append() {
     for target in ${IMXBOOT_TARGETS}; do
         if [ "${target}" = "flash_evk_spl" ]; then
             if [ -e "${S}/${BOOT_CONFIG_MACHINE}-${target}-nohdmi" ]; then
@@ -65,7 +65,7 @@ do_install_append() {
     done
 }
 
-do_deploy_append() {
+do_deploy:append() {
     for target in ${IMXBOOT_TARGETS}; do
         if [ "${target}" = "flash_evk_spl" ]; then
             # Also create imx-boot link with the machine name
